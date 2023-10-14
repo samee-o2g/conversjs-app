@@ -1,0 +1,45 @@
+version: '3.7'
+
+services:
+  main:
+    image: ghcr.io/processone/ejabberd
+    container_name: ejabberd-main
+    ports:
+      - "5222:5222"
+      - "5269:5269"
+      - "5280:5280"
+      - "5443:5443"
+    environment:
+      - ERLANG_NODE_ARG=ejabberd@main
+      - ERLANG_COOKIE=ejabberdcookie
+      - CTL_ON_CREATE=join_cluster ejabberd@main ;
+          register admin localhost admin ;
+          register samee localhost samee ;
+          register hasnat localhost hasnat ;
+          register nabeel localhost nabeel ;
+          register faisal localhost faisal
+      - CTL_ON_START=registered_users localhost ;
+        status
+    env_file:
+      - ./ejabberd/env/.env
+      - ./ejabberd/env/module.env
+    volumes:
+      - ./ejabberd/ejabberd.yml:/opt/ejabberd/conf/ejabberd.yml
+      - ./ejabberd/database:/opt/ejabberd/database
+
+  replica:
+    image: ghcr.io/processone/ejabberd
+    depends_on:
+      main:
+        condition: service_healthy
+    environment:
+      - ERLANG_NODE_ARG=ejabberd@replica
+      - ERLANG_COOKIE=ejabberdcookie
+      - CTL_ON_CREATE=join_cluster ejabberd@main
+      - CTL_ON_START=registered_users localhost ;
+          status
+    env_file:
+      - ./ejabberd/env/.env
+      - ./ejabberd/env/module.env
+    volumes:
+      - ./ejabberd/ejabberd.yml:/opt/ejabberd/conf/ejabberd.yml
