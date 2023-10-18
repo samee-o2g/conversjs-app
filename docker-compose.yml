@@ -1,50 +1,13 @@
 version: '3.7'
 
-services:
-  mysql:
-    image: mysql:latest
-    container_name: ejabberd-mysql
-    volumes:
-      - ./mysql/data:/var/lib/mysql
-      - ./mysql/mysql.sql:/docker-entrypoint-initdb.d/mysql.sql:ro
-    command: --default-authentication-plugin=mysql_native_password
-    restart: always
-    ports:
-      - 3306:3306
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: ejabberd_test
-      MYSQL_USER: ejabberd_test
-      MYSQL_PASSWORD: ejabberd_test
-
-  # mysql:
-  #   image: mysql:latest
-  #   container_name: mysql
-  #   environment:
-  #     - MYSQL_ROOT_PASSWORD=root
-  #   volumes:
-  #     - ./mysql/data:/var/lib/mysql
-  #     - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
-  #     - ./mysql/mysql.sql:/docker-entrypoint-initdb.d/mysql.sql
-  #     - ./mysql/database.sql:/opt/ejabberd/database.sql
-  #   healthcheck:
-  #     test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 3
-  #   command: > 
-  #     bash -c "docker-entrypoint.sh mysqld && 
-  #     mysql -u root -proot  < /docker-entrypoint-initdb.d/init.sql &&
-  #     mysql -u root -proot ejabberd < /docker-entrypoint-initdb.d/mysql.sql &&
-  #     mysql -u root -proot ejabberd < /opt/ejabberd/database.sql"
-    
+services:    
   main:
     image: ghcr.io/processone/ejabberd
     container_name: ejabberd-main
     ports:
       - "5222:5222"
       - "5269:5269"
-      - "5280:5280"
+      - "80:5280"
       - "5443:5443"
     env_file:
       - ./ejabberd/env/.env
@@ -52,35 +15,14 @@ services:
     volumes:
       - ./ejabberd/ejabberd.yml:/opt/ejabberd/conf/ejabberd.yml
       - ./ejabberd/database:/opt/ejabberd/database
-    external_links:
-        - ejabberd-mysql
-    links:
-      - mysql
     environment:
       - ERLANG_NODE_ARG=ejabberd@main
       - ERLANG_COOKIE=ejabberdcookie
-      - CTL_ON_CREATE=join_cluster ejabberd@main ;
-          register admin localhost admin ;
-          register samee localhost samee ;
-          register hasnat localhost hasnat ;
-          register nabeel localhost nabeel ;
-          register faisal localhost faisal
-      - CTL_ON_START=registered_users localhost ;
+      - CTL_ON_CREATE=
+          register admin chat.demo.edyou.io admin ;
+          register samee chat.demo.edyou.io samee ;
+          register hasnat chat.demo.edyou.io hasnat ;
+          register nabeel chat.demo.edyou.io nabeel ;
+          register faisal chat.demo.edyou.io faisal
+      - CTL_ON_START=registered_users chat.demo.edyou.io ;
         status
-
-  # replica:
-  #   image: ghcr.io/processone/ejabberd
-  #   depends_on:
-  #     main:
-  #       condition: service_healthy
-  #   environment:
-  #     - ERLANG_NODE_ARG=ejabberd@replica
-  #     - ERLANG_COOKIE=ejabberdcookie
-  #     - CTL_ON_CREATE=join_cluster ejabberd@main
-  #     - CTL_ON_START=registered_users localhost ;
-  #         status
-  #   env_file:
-  #     - ./ejabberd/env/.env
-  #     - ./ejabberd/env/module.env
-  #   volumes:
-  #     - ./ejabberd/ejabberd.yml:/opt/ejabberd/conf/ejabberd.yml
