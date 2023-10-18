@@ -1,1 +1,5 @@
 /ejabberd/database/
+/mysql/data
+/convers.js
+/convers-desktop
+/libsignal-protocol-javascript
