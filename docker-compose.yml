@@ -15,6 +15,7 @@ services:
     volumes:
       - ./ejabberd/ejabberd.yml:/opt/ejabberd/conf/ejabberd.yml
       - ./ejabberd/database:/opt/ejabberd/database
+      - ./ejabberd/letsencrypt/live/chat.demo.edyou.io:/etc/letsencrypt/live/chat.demo.edyou.io
     environment:
       - ERLANG_NODE_ARG=ejabberd@main
       - ERLANG_COOKIE=ejabberdcookie
