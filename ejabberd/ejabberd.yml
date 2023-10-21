@@ -23,9 +23,10 @@ ca_file: /opt/ejabberd/conf/cacert.pem
 
 certfiles:
   - /opt/ejabberd/conf/server.pem
-  # - /etc/letsencrypt/live/chat.demo.edyou.io/privkey.pem
-  # - /etc/letsencrypt/live/chat.demo.edyou.io/fullchain.pem
-  # - /etc/letsencrypt/live/chat.demo.edyou.io/cert.pem
+  - /opt/ejabberd/conf/letsencrypt/privkey.pem
+  - /opt/ejabberd/conf/letsencrypt/fullchain.pem
+  - /opt/ejabberd/conf/letsencrypt/chain.pem
+  - /opt/ejabberd/conf/letsencrypt/cert.pem
 
 ## If you already have certificates, list them here
 # certfiles:
